@@ -1,3 +1,5 @@
+// Letras más comunes y fáciles de combinar en español
+// Ordenadas alfabéticamente para mejor referencia
 export const cardsLetters = [
     {
         id: 1,
@@ -72,112 +74,77 @@ export const cardsLetters = [
     {
         id: 11,
         type: 'letter',
-        value: 'K',
+        value: 'L',
         img: '',
         matched: false
     },
     {
         id: 12,
         type: 'letter',
-        value: 'L',
+        value: 'M',
         img: '',
         matched: false
     },
     {
         id: 13,
         type: 'letter',
-        value: 'M',
+        value: 'N',
         img: '',
         matched: false
     },
     {
         id: 14,
         type: 'letter',
-        value: 'N',
+        value: 'O',
         img: '',
         matched: false
     },
     {
         id: 15,
         type: 'letter',
-        value: 'O',
+        value: 'P',
         img: '',
         matched: false
     },
     {
         id: 16,
         type: 'letter',
-        value: 'P',
+        value: 'Q',
         img: '',
         matched: false
     },
     {
         id: 17,
         type: 'letter',
-        value: 'Q',
+        value: 'R',
         img: '',
         matched: false
     },
     {
         id: 18,
         type: 'letter',
-        value: 'R',
+        value: 'S',
         img: '',
         matched: false
     },
     {
         id: 19,
         type: 'letter',
-        value: 'S',
+        value: 'T',
         img: '',
         matched: false
     },
     {
         id: 20,
         type: 'letter',
-        value: 'T',
+        value: 'U',
         img: '',
         matched: false
     },
     {
         id: 21,
         type: 'letter',
-        value: 'U',
-        img: '',
-        matched: false
-    },
-    {
-        id: 22,
-        type: 'letter',
         value: 'V',
-        img: '',
-        matched: false
-    },
-    {
-        id: 23,
-        type: 'letter',
-        value: 'W',
-        img: '',
-        matched: false
-    },
-    {
-        id: 24,
-        type: 'letter',
-        value: 'X',
-        img: '',
-        matched: false
-    },
-    {
-        id: 25,
-        type: 'letter',
-        value: 'Y',
-        img: '',
-        matched: false
-    },
-    {
-        id: 26,
-        type: 'letter',
-        value: 'Z',
         img: '',
         matched: false
     }
