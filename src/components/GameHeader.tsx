@@ -9,10 +9,7 @@ interface GameHeaderProps {
 }
 
 export const GameHeader: React.FC<GameHeaderProps> = ({
-  currentPlayer,
-  player1,
-  player2,
-  currentPlayerIndex,
+ 
   timeLeft,
 }) => {
   // Estado local para la animación suave

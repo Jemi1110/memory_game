@@ -131,7 +131,7 @@ export function useGameLogic({ player1, player2, onGameOver }: UseGameLogicProps
   }, [state.isPlaying, state.gameOver, actions.setTimeLeft]);
 
   // Inicializar el temporizador
-  const { timeLeft, reset: resetTimer } = useGameTimer({
+  const { reset: resetTimer } = useGameTimer({
     isActive: state.isPlaying && !state.gameOver && !state.waitingForCard,
     onTimeOut: handleTimeOut,
     onTick: handleTick
@@ -164,8 +164,7 @@ export function useGameLogic({ player1, player2, onGameOver }: UseGameLogicProps
         actions.setGameOver(true);
         
         // Determine winner/loser and reason
-        const winner = hasWon ? currentPlayer : 
-                             (otherPlayer.score > currentPlayer.score ? otherPlayer : null);
+    
         const loser = hasLost ? currentPlayer : 
                               (otherPlayer.score < currentPlayer.score ? otherPlayer : null);
         const reason = hasWon ? 'score_reached' as const : 'negative_score' as const;
