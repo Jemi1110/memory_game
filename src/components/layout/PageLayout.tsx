@@ -15,7 +15,7 @@ const PageLayout: FC<PageLayoutProps> = ({ children, className = '' }) => {
       transition={{ duration: 0.3 }}
       className={`min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6 ${className}`}
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-20">
         <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8">
           {children}
         </div>

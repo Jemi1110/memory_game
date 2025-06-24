@@ -54,32 +54,31 @@ const Modal: React.FC<ModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          {/* Fondo oscuro */}
+        <>
+          {/* Overlay */}
           <motion.div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeOnOverlayClick ? onClose : undefined}
+            className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm"
           />
 
-          {/* Contenido del modal */}
-          <div className="flex min-h-screen items-center justify-center p-4 text-center">
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto pointer-events-none">
             <motion.div
-              className={`w-full ${sizeClasses[maxWidth]} transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all ${className}`}
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 500 }}
               onClick={(e) => e.stopPropagation()}
+              className={`w-full pointer-events-auto ${sizeClasses[maxWidth]} bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all ${className}`}
             >
-              {/* Encabezado */}
+              {/* Header */}
               {(title || showCloseButton) && (
-                <div className="flex items-center justify-between mb-4">
+                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                   {title && (
-                    <h3 className="text-xl font-semibold text-gray-900">
-                      {title}
-                    </h3>
+                    <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
                   )}
                   {showCloseButton && (
                     <button
@@ -93,13 +92,13 @@ const Modal: React.FC<ModalProps> = ({
                 </div>
               )}
 
-              {/* Contenido */}
-              <div className="mt-2">
+              {/* Content */}
+              <div className="p-6">
                 {children}
               </div>
             </motion.div>
           </div>
-        </div>
+        </>
       )}
     </AnimatePresence>
   );

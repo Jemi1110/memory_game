@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { TURN_DURATION } from '../types/game';
 
 interface UseGameTimerProps {
@@ -7,47 +7,83 @@ interface UseGameTimerProps {
   onTick?: (timeLeft: number) => void;
 }
 
-export const useGameTimer = ({ isActive, onTimeOut, onTick }: UseGameTimerProps) => {
+export function useGameTimer({ isActive, onTimeOut, onTick }: UseGameTimerProps) {
   const [timeLeft, setTimeLeft] = useState(TURN_DURATION);
-  const [isRunning, setIsRunning] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number>(0);
+  const onTimeOutRef = useRef(onTimeOut);
+  const onTickRef = useRef(onTick);
 
-  const resetTimer = useCallback(() => {
+  // Actualizar las referencias de los callbacks cuando cambian
+  useEffect(() => {
+    onTimeOutRef.current = onTimeOut;
+    onTickRef.current = onTick;
+  }, [onTimeOut, onTick]);
+
+  // Resetear el temporizador
+  const reset = useCallback(() => {
+    console.log('Resetting timer to', TURN_DURATION);
+    startTimeRef.current = Date.now();
     setTimeLeft(TURN_DURATION);
   }, []);
 
-  const startTimer = useCallback(() => {
-    setIsRunning(true);
-  }, []);
-
-  const stopTimer = useCallback(() => {
-    setIsRunning(false);
-  }, []);
-
+  // Efecto principal para manejar el temporizador
   useEffect(() => {
-    if (!isActive || !isRunning) return;
+    if (!isActive) {
+      // Limpiar el intervalo si el temporizador está inactivo
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      return;
+    }
 
-    const timerId = setInterval(() => {
-      setTimeLeft(prev => {
-        const newTime = prev - 1;
-        onTick?.(newTime);
-        
-        if (newTime <= 0) {
-          onTimeOut();
-          return TURN_DURATION;
+    // Iniciar el temporizador
+    startTimeRef.current = Date.now();
+    
+    // Función para actualizar el temporizador
+    const updateTimer = () => {
+      const now = Date.now();
+      const elapsed = (now - startTimeRef.current) / 1000; // Tiempo transcurrido en segundos
+      const newTimeLeft = Math.max(0, TURN_DURATION - elapsed);
+      
+      // Actualizar el estado
+      setTimeLeft(newTimeLeft);
+      
+      // Llamar al callback de tick si está definido
+      if (onTickRef.current) {
+        onTickRef.current(newTimeLeft);
+      }
+      
+      // Si se acaba el tiempo, notificar
+      if (newTimeLeft <= 0) {
+        if (onTimeOutRef.current) {
+          onTimeOutRef.current();
         }
-        return newTime;
-      });
-    }, 1000);
-
-    return () => clearInterval(timerId);
-  }, [isActive, isRunning, onTimeOut, onTick]);
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+      }
+    };
+    
+    // Configurar el intervalo
+    timerRef.current = setInterval(updateTimer, 100);
+    
+    // Actualizar inmediatamente
+    updateTimer();
+    
+    // Limpiar el intervalo cuando el componente se desmonte o cambie isActive
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [isActive]);
 
   return {
     timeLeft,
-    setTimeLeft,
-    resetTimer,
-    startTimer,
-    stopTimer,
-    isRunning,
+    reset,
   };
-};
+}

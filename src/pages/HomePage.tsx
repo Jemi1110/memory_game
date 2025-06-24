@@ -31,7 +31,8 @@ export default function HomePage() {
   const featureCardVariants = {
     hover: {
       y: -5,
-      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+      scale: 1.02,
+      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
       transition: {
         duration: 0.3,
       },
@@ -39,181 +40,214 @@ export default function HomePage() {
   };
 
   return (
-    <PageLayout>
-      <div className="py-8">
-        <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-6">
-            Memory Game
-          </h1>
-          <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-            Un juego de memoria desafiante donde deberás emparejar letras con colores
-            lo más rápido posible. ¡Demuestra tus habilidades y llega a la cima!
-          </p>
-        </motion.div>
+    <PageLayout className="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-10"></div>
+        <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.h1 
+              className="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-6"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              Memory Game Challenge
+            </motion.h1>
+            <motion.p 
+              className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              Pon a prueba tu memoria y velocidad en este emocionante juego de emparejamiento. 
+              ¡Demuestra que tienes lo necesario para alcanzar la máxima puntuación!
+            </motion.p>
+            <motion.div
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <Button 
+                onClick={() => navigate('/game')} 
+                variant="primary"
+                className="px-8 py-3 text-lg font-semibold shadow-lg transform transition-all hover:scale-105"
+              >
+                Jugar Ahora
+              </Button>
+              <Button 
+                onClick={() => navigate('/juego2')}
+                variant="primary"
+                className="px-8 py-3 text-lg font-semibold shadow-lg transform transition-all hover:scale-105"
+              >
+                Play Mini Juego
+              </Button>
+              <Button 
+                onClick={() => {
+                  const element = document.getElementById('como-jugar');
+                  element?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                variant="outline"
+                className="px-8 py-3 text-lg font-semibold border-2 border-blue-600 text-blue-600 hover:bg-blue-50"
+              >
+                Cómo Jugar
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </div>
 
+      {/* Features Section */}
+      <div className="container mx-auto px-4 py-16 md:py-24 max-w-7xl">
         <motion.div 
           className="grid md:grid-cols-3 gap-8 mb-16"
           variants={containerVariants}
           initial="hidden"
-          animate="visible"
+          whileInView="visible"
+          viewport={{ once: true }}
         >
-          {/* Reglas del Juego */}
+          {/* Objetivo */}
           <motion.div 
-            className="bg-white rounded-2xl p-6 shadow-lg"
+            className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-100"
             variants={itemVariants}
-            whileHover="hover"
+            whileHover={featureCardVariants.hover}
           >
-            <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <span className="text-blue-600 text-2xl">🎯</span>
+            <div className="bg-blue-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 mx-auto">
+              <span className="text-2xl">🎯</span>
             </div>
-            <h2 className="text-xl font-bold text-center mb-4 text-gray-800">Objetivo</h2>
-            <p className="text-gray-600 text-center">
-              Consigue <span className="font-bold text-blue-600">500 puntos</span> combinando correctamente
-              las cartas de letras con sus colores correspondientes.
+            <h2 className="text-xl font-bold text-center mb-3 text-gray-800">Objetivo</h2>
+            <p className="text-gray-600 text-center leading-relaxed">
+              Consigue <span className="font-bold text-blue-600">500 puntos</span> combinando correctamente las cartas de colores y letras.
             </p>
           </motion.div>
 
           {/* Tiempo */}
           <motion.div 
-            className="bg-white rounded-2xl p-6 shadow-lg"
+            className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-100"
             variants={itemVariants}
-            whileHover="hover"
+            whileHover={featureCardVariants.hover}
           >
-            <div className="bg-yellow-100 w-12 h-12 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <span className="text-yellow-600 text-2xl">⏱️</span>
+            <div className="bg-yellow-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 mx-auto">
+              <span className="text-2xl">⏱️</span>
             </div>
-            <h2 className="text-xl font-bold text-center mb-4 text-gray-800">Tiempo</h2>
-            <p className="text-gray-600 text-center">
-              Tienes <span className="font-bold text-yellow-600">10 segundos</span> por turno.
-              ¡Responde rápido para ganar más puntos!
+            <h2 className="text-xl font-bold text-center mb-3 text-gray-800">Tiempo Límite</h2>
+            <p className="text-gray-600 text-center leading-relaxed">
+              Gana <span className="font-bold text-green-600">100 puntos</span> por cada acierto consecutivo. ¡Las rachas multiplican tu puntuación!
             </p>
           </motion.div>
 
           {/* Puntuación */}
           <motion.div 
-            className="bg-white rounded-2xl p-6 shadow-lg"
+            className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-100"
             variants={itemVariants}
-            whileHover="hover"
+            whileHover={featureCardVariants.hover}
           >
-            <div className="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <span className="text-green-600 text-2xl">🏆</span>
+            <div className="bg-green-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 mx-auto">
+              <span className="text-2xl">🏆</span>
             </div>
-            <h2 className="text-xl font-bold text-center mb-4 text-gray-800">Puntuación</h2>
-            <p className="text-gray-600 text-center">
-              Gana puntos por velocidad y rachas correctas. 
-              ¡Las rachas te dan bonificaciones especiales!
+            <h2 className="text-xl font-bold text-center mb-3 text-gray-800">Puntuación</h2>
+            <p className="text-gray-600 text-center leading-relaxed">
+              Gana <span className="font-bold text-green-600">100 puntos</span> por cada acierto consecutivo. ¡Las rachas multiplican tu puntuación!
             </p>
           </motion.div>
         </motion.div>
+      </div>
 
-        {/* Detalles del Juego */}
-        <motion.div 
-          className="grid md:grid-cols-2 gap-8 mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          {/* Puntos por Velocidad */}
+      {/* Cómo Jugar Section */}
+      <div id="como-jugar" className="bg-white py-16 md:py-24">
+        <div className="container mx-auto px-4 max-w-4xl">
           <motion.div 
-            className="bg-white rounded-2xl p-6 shadow-lg"
-            variants={featureCardVariants}
-            whileHover="hover"
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
           >
-            <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center">
-              <span className="mr-2">🏃‍♂️</span> Puntos por Velocidad
-            </h3>
-            <ul className="space-y-2">
-              <li className="flex items-center text-gray-700">
-                <span className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center mr-2 text-sm">1</span>
-                <span>🚀 1-4 seg = <span className="font-bold text-green-600">100 puntos</span> (Súper rápido)</span>
-              </li>
-              <li className="flex items-center text-gray-700">
-                <span className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center mr-2 text-sm">2</span>
-                <span>🏃 5-7 seg = <span className="font-bold text-blue-600">75 puntos</span> (Muy rápido)</span>
-              </li>
-              <li className="flex items-center text-gray-700">
-                <span className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center mr-2 text-sm">3</span>
-                <span>⚡ 8-10 seg = <span className="font-bold text-yellow-600">50 puntos</span> (Rápido)</span>
-              </li>
-              <li className="flex items-center text-red-500">
-                <span className="w-5 h-5 bg-red-100 rounded-full flex items-center justify-center mr-2 text-sm">!</span>
-                <span>🐌 Tiempo agotado = <span className="font-bold">-25 puntos</span></span>
-              </li>
-            </ul>
+            <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-4">
+              Cómo Jugar
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Aprende las reglas básicas y domina el juego en minutos.
+            </p>
           </motion.div>
 
-          {/* Bonificaciones y Penalizaciones */}
-          <div className="space-y-6">
-            <motion.div 
-              className="bg-white rounded-2xl p-6 shadow-lg"
-              variants={featureCardVariants}
-              whileHover="hover"
-            >
-              <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center">
-                <span className="mr-2">✨</span> Bonificaciones
-              </h3>
-              <ul className="space-y-2">
-                <li className="flex items-center text-gray-700">
-                  <span className="w-5 h-5 bg-green-100 text-green-600 rounded-full flex items-center justify-center mr-2 text-sm">3</span>
-                  <span><span className="font-medium">3 correctas seguidas</span> = <span className="font-bold text-green-600">+25 puntos</span> bonus</span>
-                </li>
-                <li className="flex items-center text-gray-700">
-                  <span className="w-5 h-5 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-2 text-sm">5</span>
-                  <span><span className="font-medium">5 correctas seguidas</span> = <span className="font-bold text-blue-600">+50 puntos</span> bonus</span>
-                </li>
-                <li className="flex items-center text-gray-700">
-                  <span className="w-5 h-5 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mr-2 text-sm">7</span>
-                  <span><span className="font-medium">7+ correctas seguidas</span> = <span className="font-bold text-purple-600">+100 puntos</span> bonus</span>
-                </li>
-              </ul>
-            </motion.div>
-
-            <motion.div 
-              className="bg-white rounded-2xl p-6 shadow-lg"
-              variants={featureCardVariants}
-              whileHover="hover"
-            >
-              <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center">
-                <span className="mr-2">⚠️</span> Penalizaciones
-              </h3>
-              <ul className="space-y-2">
-                <li className="flex items-center text-gray-700">
-                  <span className="w-5 h-5 bg-red-100 text-red-600 rounded-full flex items-center justify-center mr-2 text-sm">✖</span>
-                  <span>Respuesta incorrecta = <span className="font-bold text-red-600">-15 puntos</span></span>
-                </li>
-                <li className="flex items-center text-gray-700">
-                  <span className="w-5 h-5 bg-red-100 text-red-600 rounded-full flex items-center justify-center mr-2 text-sm">⏱</span>
-                  <span>Tiempo agotado = <span className="font-bold text-red-600">-25 puntos</span></span>
-                </li>
-              </ul>
-            </motion.div>
+          <div className="space-y-8">
+            {[
+              {
+                number: '1',
+                title: 'Inicia una Partida',
+                description: 'Comienza un nuevo juego seleccionando "Jugar Ahora" e ingresa los nombres de los jugadores.',
+                icon: '🚀'
+              },
+              {
+                number: '2',
+                title: 'Responde Rápido',
+                description: 'Tienes 15 segundos para decidir si la letra y el color coinciden. ¡Sé rápido y preciso!',
+                icon: '⚡'
+              },
+              {
+                number: '3',
+                title: 'Acumula Puntos',
+                description: 'Gana puntos por cada respuesta correcta. Las rachas de aciertos otorgan bonificaciones adicionales.',
+                icon: '🏅'
+              },
+              {
+                number: '4',
+                title: 'Llega a la Meta',
+                description: 'El primer jugador en alcanzar 500 puntos gana la partida. ¡Demuestra quién tiene la mejor memoria!',
+                icon: '🎯'
+              }
+            ].map((step, index) => (
+              <motion.div 
+                key={index}
+                className="flex flex-col md:flex-row gap-6 p-6 bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow border border-gray-100"
+                initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ scale: 1.02 }}
+              >
+                <div className="flex-shrink-0 w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center text-2xl">
+                  {step.icon}
+                </div>
+                <div>
+                  <div className="flex items-center mb-2">
+                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold mr-3">
+                      {step.number}
+                    </span>
+                    <h3 className="text-xl font-bold text-gray-800">{step.title}</h3>
+                  </div>
+                  <p className="text-gray-600 pl-11">{step.description}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
-        </motion.div>
+        </div>
+      </div>
 
-        {/* Botón de inicio */}
-        <motion.div 
-          className="text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">
-            ¿Estás listo para el desafío?
-          </h2>
-          <Button 
-            onClick={() => navigate("/setup")}
-            size="lg"
-            variant="primary"
-            className="px-12 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+      {/* CTA Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 py-16 md:py-24">
+        <div className="container mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
           >
-            ¡Empezar a Jugar!
-          </Button>
-        </motion.div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">¿Listo para el desafío?</h2>
+            <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
+              Únete a cientos de jugadores que ya están mejorando su memoria y velocidad de reacción.
+            </p>
+            <Button 
+              onClick={() => navigate('/game')} 
+              variant="primary"
+              className="px-8 py-3 text-lg font-semibold shadow-lg transform transition-all hover:scale-105"
+            >
+              Comenzar a Jugar
+            </Button>
+          </motion.div>
+        </div>
       </div>
     </PageLayout>
   );

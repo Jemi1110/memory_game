@@ -85,32 +85,94 @@ export const useGameState = (player1Name: string, player2Name: string) => {
   }, []);
 
   const nextTurn = useCallback(() => {
-    if (state.gameOver) return false;
+    if (state.gameOver) {
+      console.log('Game is over, cannot proceed to next turn');
+      return false;
+    }
+    
+    console.log('Proceeding to next turn');
     dispatch({ type: 'NEXT_TURN' });
     return true;
   }, [state.gameOver]);
 
   const selectCard = useCallback((deckType: 'colors' | 'letters' | null) => {
-    if (!state.waitingForCard && deckType !== null) return false;
+    // Get fresh state values
+    const { waitingForCard, gameOver, currentPlayerIndex } = state;
     
-    dispatch({ type: 'SELECT_CARD', payload: deckType });
-    dispatch({ type: 'SET_WAITING_FOR_CARD', payload: false });
+    console.log('useGameState selectCard called with:', { 
+      deckType, 
+      waitingForCard,
+      gameOver,
+      currentPlayerIndex,
+      players: state.players.map(p => p.name)
+    });
     
-    if (deckType !== null) {
-      nextTurn();
+    // Solo permitir seleccionar carta si estamos esperando una carta
+    if (!waitingForCard) {
+      console.log('Not waiting for card selection');
+      return false;
     }
     
-    return true;
-  }, [nextTurn, state.waitingForCard]);
-
-  const answerQuestion = useCallback((_isCorrect: boolean) => {
-    if (state.waitingForCard) return false;
+    if (deckType === null) {
+      console.log('Invalid deck type');
+      return false;
+    }
     
+    console.log('Dispatching SELECT_CARD with:', deckType);
+    
+    try {
+      // Actualizar el estado con la carta seleccionada
+      dispatch({ type: 'SELECT_CARD', payload: deckType });
+      
+      // Marcar que ya no estamos esperando por una carta
+      dispatch({ type: 'SET_WAITING_FOR_CARD', payload: false });
+      
+      console.log('Card selected successfully');
+      
+      // Cambiar al siguiente turno después de un breve retraso
+      // para permitir que se complete la animación
+      setTimeout(() => {
+        console.log('Moving to next turn after card selection');
+        // Llamamos a nextTurn solo si no se ha terminado el juego
+        if (!gameOver) {
+          nextTurn();
+        } else {
+          console.log('Game is over, not moving to next turn');
+        }
+      }, 300); // Reducido el tiempo de espera para una mejor experiencia de usuario
+      
+      return true;
+    } catch (error) {
+      console.error('Error in selectCard:', error);
+      dispatch({ type: 'SET_WAITING_FOR_CARD', payload: false });
+      return false;
+    }
+  }, [state, nextTurn]);
+
+  const answerQuestion = useCallback((isCorrect: boolean) => {
+    // Get fresh state values
+    const { hasAnswered } = state;
+    
+    console.log('answerQuestion called with:', { 
+      isCorrect, 
+      hasAnswered, 
+      waitingForCard: state.waitingForCard 
+    });
+    
+    // Si ya respondió, no hacer nada
+    if (hasAnswered) {
+      console.log('Question already answered');
+      return false;
+    }
+    
+    console.log('Marking question as answered and waiting for card selection');
+    
+    // Marcamos que ya respondió y que estamos esperando la selección de carta
     dispatch({ type: 'SET_HAS_ANSWERED', payload: true });
     dispatch({ type: 'SET_WAITING_FOR_CARD', payload: true });
     
     return true;
-  }, [state.waitingForCard]);
+  }, [state]);
 
   const updatePlayer = useCallback((playerIndex: number, updates: Partial<Player> | ((player: Player) => Player)) => {
     dispatch({ 

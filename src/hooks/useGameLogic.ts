@@ -6,32 +6,19 @@ import type { Player } from '../types/game';
 import { cardsColors } from '../data/cardsColors';
 import { cardsLetters } from '../data/cardsLetters';
 
-export function useGameLogic(players: { player1: string; player2: string }) {
-  const { state, actions } = useGameState(players.player1, players.player2);
+interface UseGameLogicProps {
+  player1: string;
+  player2: string;
+  onGameOver?: (players: Player[], loser: Player | null, reason: 'score_reached' | 'negative_score') => void;
+}
+
+export function useGameLogic({ player1, player2, onGameOver }: UseGameLogicProps) {
+  const { state, actions } = useGameState(player1, player2);
   const currentPlayer = state.players[state.currentPlayerIndex];
-  
+
   // Memoize card decks to prevent unnecessary re-renders
   const colorDeck = useMemo(() => cardsColors, []);
   const letterDeck = useMemo(() => cardsLetters, []);
-
-  // Configurar el temporizador
-  const handleTimeOut = useCallback(() => {
-    // Cuando se acaba el tiempo, se penaliza con respuesta incorrecta
-    if (state.isPlaying) {
-      handleAnswer(false);
-      actions.nextTurn();
-    }
-  }, [state.isPlaying, actions]);
-
-  const { timeLeft } = useGameTimer({
-    isActive: state.isPlaying && !state.gameOver,
-    onTimeOut: handleTimeOut,
-  });
-
-  // Sincronizar el tiempo restante con el estado
-  useEffect(() => {
-    actions.setTimeLeft(timeLeft);
-  }, [timeLeft, actions]);
 
   // Calcular puntos por velocidad de respuesta
   const calculateSpeedPoints = useCallback((timeLeft: number): number => {
@@ -59,25 +46,36 @@ export function useGameLogic(players: { player1: string; player2: string }) {
 
   // Manejar la respuesta del jugador
   const handleAnswer = useCallback((isCorrect: boolean): boolean => {
-    if (state.waitingForCard) return false;
+    if (state.waitingForCard) {
+      console.log('Already waiting for card, ignoring answer');
+      return false;
+    }
     
-    // Actualizar el estado de la respuesta
-    actions.answerQuestion(isCorrect);
+    console.log('Processing answer:', { isCorrect, timeLeft: state.timeLeft });
+    
+    // Detener el temporizador inmediatamente al responder
+    stop();
     
     // Calcular puntos base
     let points = isCorrect ? GAME_POINTS.CORRECT_ANSWER : GAME_POINTS.INCORRECT_ANSWER;
+    let speedPoints = 0;
+    let streakBonus = 0;
     
     // Calcular bonificaciones si la respuesta es correcta
     if (isCorrect) {
-      const speedPoints = calculateSpeedPoints(state.timeLeft);
+      speedPoints = calculateSpeedPoints(state.timeLeft);
       points += speedPoints;
-      
-      // Manejar racha de respuestas correctas
-      actions.updatePlayer(state.currentPlayerIndex, (player) => {
+      console.log('Speed points:', speedPoints, 'Total points:', points);
+    }
+    
+    // Actualizar el estado del jugador
+    actions.updatePlayer(state.currentPlayerIndex, (player: Player) => {
+      // Calcular bonificación por racha solo si la respuesta es correcta
+      if (isCorrect) {
         const newStreak = player.lastAnswerWasCorrect ? player.correctStreak + 1 : 1;
-        const streakBonus = player.lastAnswerWasCorrect 
-          ? calculateStreakBonus(newStreak)
-          : 0;
+        streakBonus = player.lastAnswerWasCorrect ? calculateStreakBonus(newStreak) : 0;
+        
+        console.log('Player stats - Streak:', newStreak, 'Bonus:', streakBonus);
         
         return {
           ...player,
@@ -85,78 +83,156 @@ export function useGameLogic(players: { player1: string; player2: string }) {
           correctStreak: newStreak,
           lastAnswerWasCorrect: true,
         };
-      });
-    } else {
-      // Reiniciar racha por respuesta incorrecta
-      actions.updatePlayer(state.currentPlayerIndex, (player) => ({
-        ...player,
-        score: player.score + points,
-        correctStreak: 0,
-        lastAnswerWasCorrect: false,
-      }));
-    }
-    
-    // Verificar condiciones de victoria/derrota
-    const updatedPlayer = {
-      ...state.players[state.currentPlayerIndex],
-      score: state.players[state.currentPlayerIndex].score + points
-    };
-    
-    if (updatedPlayer.score >= WINNING_SCORE || updatedPlayer.score <= LOSING_SCORE) {
-      actions.setGameOver(true);
-      
-      if (updatedPlayer.score <= LOSING_SCORE) {
-        // Almacenar estado del juego para la pantalla de GameOver
-        sessionStorage.setItem('gameOverState', JSON.stringify({
-          players: state.players.map((p, idx) => 
-            idx === state.currentPlayerIndex ? updatedPlayer : p
-          ),
-          loser: updatedPlayer,
-          reason: 'negative_score' as const
-        }));
+      } else {
+        // Reiniciar racha por respuesta incorrecta
+        return {
+          ...player,
+          score: Math.max(player.score + points, LOSING_SCORE), // No permitir puntuación menor al mínimo
+          correctStreak: 0,
+          lastAnswerWasCorrect: false,
+        };
       }
-    }
+    });
+    
+    // Marcar que ya se respondió y esperar por la selección de carta
+    console.log('Marking question as answered, waiting for card selection');
+    actions.answerQuestion(isCorrect);
     
     return true;
   }, [
     state.waitingForCard, 
     state.timeLeft, 
     state.currentPlayerIndex, 
-    state.players,
-    actions,
+    actions, 
     calculateSpeedPoints, 
     calculateStreakBonus
   ]);
 
+  // Manejador de tiempo agotado
+  const handleTimeOut = useCallback(() => {
+    console.log('Time out! Handling timeout...');
+    if (state.isPlaying && !state.gameOver) {
+      console.log('Processing timeout for player:', currentPlayer.name);
+      const answerProcessed = handleAnswer(false);
+      
+      if (answerProcessed) {
+        setTimeout(() => {
+          actions.nextTurn();
+        }, 500);
+      }
+    }
+  }, [state.isPlaying, state.gameOver, currentPlayer, handleAnswer, actions.nextTurn]);
+
+  // Manejador de tick del temporizador
+  const handleTick = useCallback((newTime: number) => {
+    if (state.isPlaying && !state.gameOver) {
+      actions.setTimeLeft(Math.floor(newTime));
+    }
+  }, [state.isPlaying, state.gameOver, actions.setTimeLeft]);
+
+  // Inicializar el temporizador
+  const { timeLeft, reset: resetTimer } = useGameTimer({
+    isActive: state.isPlaying && !state.gameOver && !state.waitingForCard,
+    onTimeOut: handleTimeOut,
+    onTick: handleTick
+  });
+  
+  // Efecto para reiniciar el temporizador cuando cambia el turno
+  useEffect(() => {
+    if (state.isPlaying && !state.gameOver && state.waitingForCard) {
+      console.log('Resetting timer due to turn change');
+      resetTimer();
+    }
+  }, [state.currentPlayerIndex, state.isPlaying, state.gameOver, state.waitingForCard, resetTimer]);
+
+  // Check for win/lose conditions after state updates
+  useEffect(() => {
+    const checkGameOver = () => {
+      // Skip if game is already over or players aren't initialized
+      if (state.gameOver || !state.players[state.currentPlayerIndex]) return;
+      
+      const currentPlayer = state.players[state.currentPlayerIndex];
+      const otherPlayer = state.players[(state.currentPlayerIndex + 1) % 2];
+      
+      // Check if current player has won or lost
+      const hasWon = currentPlayer.score >= WINNING_SCORE;
+      const hasLost = currentPlayer.score <= LOSING_SCORE;
+      const isGameOver = hasWon || hasLost;
+      
+      if (isGameOver) {
+        // Mark game as over first to prevent further actions
+        actions.setGameOver(true);
+        
+        // Determine winner/loser and reason
+        const winner = hasWon ? currentPlayer : 
+                             (otherPlayer.score > currentPlayer.score ? otherPlayer : null);
+        const loser = hasLost ? currentPlayer : 
+                              (otherPlayer.score < currentPlayer.score ? otherPlayer : null);
+        const reason = hasWon ? 'score_reached' as const : 'negative_score' as const;
+        
+        console.log('Game over condition detected:', { 
+          currentPlayer: currentPlayer.name,
+          currentScore: currentPlayer.score,
+          otherPlayer: otherPlayer.name,
+          otherScore: otherPlayer.score,
+          WINNING_SCORE,
+          LOSING_SCORE,
+          reason
+        });
+        
+        // Trigger game over callback if provided
+        if (onGameOver) {
+          console.log('Calling onGameOver callback with players:', 
+            state.players.map(p => `${p.name}: ${p.score}`));
+          onGameOver(state.players, loser, reason);
+        }
+      }
+    };
+    
+    // Only check for game over if the game is active
+    if (state.isPlaying) {
+      checkGameOver();
+    }
+  }, [state.players, state.currentPlayerIndex, actions, onGameOver]);
+
   // Manejar selección de carta
   const selectCard = useCallback((deckType: 'colors' | 'letters'): boolean => {
-    if (!state.waitingForCard) return false;
+    console.log('useLogic selectCard called with:', { 
+      deckType, 
+      waitingForCard: state.waitingForCard,
+      hasAnswered: state.hasAnswered
+    });
     
-    actions.selectCard(deckType);
-    return true;
-  }, [state.waitingForCard, actions]);
+    if (!state.waitingForCard) {
+      console.log('Not waiting for card in useLogic');
+      return false;
+    }
+    
+    const result = actions.selectCard(deckType);
+    console.log('actions.selectCard result:', result);
+    return result;
+  }, [state.waitingForCard, state.hasAnswered, actions]);
 
-  // Devolver el estado y las acciones del juego
-  return {
+  // Definir el tipo de retorno
+  const gameLogic = {
     // Estado
+    state,
     currentPlayer,
-    currentPlayerIndex: state.currentPlayerIndex,
     timeLeft: state.timeLeft,
-    isPlaying: state.isPlaying,
     playersData: state.players,
-    selectedCard: state.selectedCard,
-    hasAnswered: state.hasAnswered,
-    waitingForCard: state.waitingForCard,
     gameOver: state.gameOver,
+    waitingForCard: state.waitingForCard,
     colorDeck,
     letterDeck,
     
     // Acciones
+    togglePause: actions.togglePause,
+    nextTurn: actions.nextTurn,
     selectCard,
     answerQuestion: handleAnswer,
-    togglePause: actions.togglePause,
-    addPoints: handleAnswer, // Compatibilidad con el código existente
-  } as const;
+  };
+
+  return gameLogic;
 }
 
 export type { Player };
