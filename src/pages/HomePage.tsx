@@ -52,7 +52,7 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              Memory Game Challenge
+                Tutti Frutti Game Card
             </motion.h1>
             <motion.p 
               className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed"
@@ -60,8 +60,8 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              Pon a prueba tu memoria y velocidad en este emocionante juego de emparejamiento. 
-              ¡Demuestra que tienes lo necesario para alcanzar la máxima puntuación!
+              Pon a prueba tu memoria y velocidad en este emocionante juego de cartas. 
+              ¡Demuestra que tienes lo necesario para alcanzar los 500 puntos para ganar!
             </motion.p>
             <motion.div
               className="flex flex-col sm:flex-row gap-4 justify-center"
