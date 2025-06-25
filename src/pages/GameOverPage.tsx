@@ -328,7 +328,7 @@ export default function GameOverPage() {
             variants={itemVariants}
           >
             <p className="text-xs text-gray-400">
-              Juego desarrollado con ❤️ © {new Date().getFullYear()}
+              Juego desarrollado por tus panas de la UTP
             </p>
           </motion.div>
         </motion.div>
