@@ -155,7 +155,7 @@ export default function HomePage() {
       </div>
 
       {/* Cómo Jugar Section */}
-      <div id="como-jugar" className="bg-white py-12 md:py-24">
+      <div id="como-jugar" className="bg-white py-4 md:py-24">
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div 
             className="text-center mb-12"
