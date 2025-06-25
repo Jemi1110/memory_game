@@ -77,7 +77,7 @@ export default function HomePage() {
                 Jugar Ahora
               </Button>
               <Button 
-                onClick={() => navigate('/juego2')}
+                onClick={() => window.location.href = 'https://jemi1110.github.io/memory_dots/'}
                 variant="primary"
                 className="px-8 py-3 text-lg font-semibold shadow-lg transform transition-all hover:scale-105"
               >
