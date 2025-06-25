@@ -133,7 +133,7 @@ export default function HomePage() {
             </div>
             <h2 className="text-xl font-bold text-center mb-3 text-gray-800">Tiempo Límite</h2>
             <p className="text-gray-600 text-center leading-relaxed">
-              Gana <span className="font-bold text-green-600">100 puntos</span> por cada acierto consecutivo. ¡Las rachas multiplican tu puntuación!
+              Consigue <span className="font-bold text-green-600">sumar puntos</span> en 15 segundos.
             </p>
           </motion.div>
 
@@ -148,14 +148,14 @@ export default function HomePage() {
             </div>
             <h2 className="text-xl font-bold text-center mb-3 text-gray-800">Puntuación</h2>
             <p className="text-gray-600 text-center leading-relaxed">
-              Gana <span className="font-bold text-green-600">100 puntos</span> por cada acierto consecutivo. ¡Las rachas multiplican tu puntuación!
+              Gana <span className="font-bold text-green-600"> puntos</span> por cada acierto consecutivo. ¡Mientras más rápido seas, más puntos!
             </p>
           </motion.div>
         </motion.div>
       </div>
 
       {/* Cómo Jugar Section */}
-      <div id="como-jugar" className="bg-white py-16 md:py-24">
+      <div id="como-jugar" className="bg-white py-12 md:py-24">
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div 
             className="text-center mb-12"
