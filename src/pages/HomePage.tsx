@@ -235,13 +235,13 @@ export default function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">¿Listo para el desafío?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">¿Listo para el juego de memoria?</h2>
             <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
-              Únete a cientos de jugadores que ya están mejorando su memoria y velocidad de reacción.
+              ¿Qué tan rápido puedes seguir la secuencia de palabras?
             </p>
             <Button 
               onClick={() => navigate('/game')} 
-              variant="primary"
+              variant="secondary"
               className="px-8 py-3 text-lg font-semibold shadow-lg transform transition-all hover:scale-105"
             >
               Comenzar a Jugar
